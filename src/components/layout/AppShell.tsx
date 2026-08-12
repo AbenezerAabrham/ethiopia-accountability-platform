@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';
 import { INITIAL_PROFILES } from '@/lib/store';
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead, NotificationItem } from '@/lib/notifications';
+import { processOfflineQueue } from '@/lib/offline-queue';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -73,8 +75,22 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     }
   }, [darkMode]);
 
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [syncToast, setSyncToast] = useState<string | null>(null);
+
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
+    setNotifications(getNotifications());
+  }, []);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      setIsOnline(true);
+      const res = await processOfflineQueue();
+      if (res.syncedCount > 0) {
+        setSyncToast(`Synced ${res.syncedCount} queued check-ins to database!`);
+        setTimeout(() => setSyncToast(null), 4000);
+      }
+    };
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

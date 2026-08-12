@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Users, MessageSquare, Trophy, BookOpen, ShieldCheck, Heart, ThumbsUp, Plus, Send, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Users, MessageSquare, Trophy, BookOpen, ShieldCheck, Heart, ThumbsUp, Plus, Send, AlertTriangle, Pin, UserCheck, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -16,7 +16,7 @@ export default function CommunityDetailPage() {
 
   const community = INITIAL_COMMUNITIES.find(c => c.slug === slug) || INITIAL_COMMUNITIES[0];
 
-  const [activeTab, setActiveTab] = useState<'posts' | 'challenges' | 'resources' | 'members'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'challenges' | 'resources' | 'members' | 'moderation'>('posts');
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
 
   // New Post Dialog
@@ -24,6 +24,10 @@ export default function CommunityDetailPage() {
   const [postTitle, setPostTitle] = useState('');
   const [postBody, setPostBody] = useState('');
   const [postMedia, setPostMedia] = useState('');
+  const [isAnnouncement, setIsAnnouncement] = useState(false);
+
+  // Members Management state
+  const [members, setMembers] = useState(INITIAL_PROFILES);
 
   // Comment Modal state
   const [commentModalPostId, setCommentModalPostId] = useState<string | null>(null);
@@ -46,7 +50,7 @@ export default function CommunityDetailPage() {
       title: postTitle,
       body: postBody,
       media_url: postMedia || undefined,
-      is_announcement: false,
+      is_announcement: isAnnouncement,
       likes_count: 0,
       comments_count: 0,
       created_at: new Date().toISOString()
@@ -56,6 +60,15 @@ export default function CommunityDetailPage() {
     setCreatePostOpen(false);
     setPostTitle('');
     setPostBody('');
+    setIsAnnouncement(false);
+  };
+
+  const handleTogglePin = (postId: string) => {
+    setPosts(posts.map(p => p.id === postId ? { ...p, is_announcement: !p.is_announcement } : p));
+  };
+
+  const handlePromoteMod = (userId: string) => {
+    setMembers(members.map(m => m.id === userId ? { ...m, role: 'moderator' } : m));
   };
 
   const handleAddComment = (postId: string) => {
@@ -101,12 +114,13 @@ export default function CommunityDetailPage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center space-x-2 border-t border-slate-800 pt-3">
+        <div className="flex items-center space-x-2 border-t border-slate-800 pt-3 overflow-x-auto scrollbar-none">
           {[
             { id: 'posts', label: 'Posts & Feed', icon: MessageSquare },
             { id: 'challenges', label: 'Challenges', icon: Trophy },
             { id: 'resources', label: 'Resources', icon: BookOpen },
-            { id: 'members', label: 'Members', icon: Users }
+            { id: 'members', label: 'Members', icon: Users },
+            { id: 'moderation', label: 'Mod Console', icon: ShieldCheck }
           ].map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -114,7 +128,7 @@ export default function CommunityDetailPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                   active ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'
                 }`}
               >
@@ -166,7 +180,7 @@ export default function CommunityDetailPage() {
                     </button>
                   </div>
 
-                  <Link href={`/admin/moderation`} className="text-[11px] text-slate-400 hover:text-red-500 flex items-center space-x-1">
+                  <Link href={`/admin`} className="text-[11px] text-slate-400 hover:text-red-500 flex items-center space-x-1">
                     <AlertTriangle className="w-3 h-3" />
                     <span>Report</span>
                   </Link>
@@ -212,25 +226,90 @@ export default function CommunityDetailPage() {
       {/* Tab 4: Members */}
       {activeTab === 'members' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {INITIAL_PROFILES.map((usr) => (
+          {members.map((usr) => (
             <Card key={usr.id} className="flex items-center space-x-3 p-3">
               <Avatar name={usr.display_name} src={usr.avatar_url} size="md" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold truncate text-slate-900 dark:text-slate-100">{usr.display_name}</p>
                 <p className="text-[11px] text-slate-400">@{usr.username}</p>
               </div>
-              <Badge variant="emerald">{usr.role}</Badge>
+              <Badge variant={usr.role === 'admin' ? 'amber' : usr.role === 'moderator' ? 'emerald' : 'slate'}>
+                {usr.role}
+              </Badge>
             </Card>
           ))}
         </div>
       )}
 
+      {/* Tab 5: Community Moderation Console */}
+      {activeTab === 'moderation' && (
+        <Card className="space-y-6 p-6">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span>Community Moderator Console</span>
+            </h2>
+            <p className="text-xs text-slate-500">Appoint moderators, pin community announcements, and maintain community safety.</p>
+          </div>
+
+          <div className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Manage Posts & Announcements</h3>
+            <div className="space-y-2">
+              {posts.map((p) => (
+                <div key={p.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                  <div className="min-w-0 flex-1 mr-4">
+                    <p className="font-bold truncate text-slate-900 dark:text-slate-100">{p.title}</p>
+                    <p className="text-[10px] text-slate-400">By {p.author?.display_name}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant={p.is_announcement ? 'secondary' : 'outline'}
+                    onClick={() => handleTogglePin(p.id)}
+                    leftIcon={<Pin className="w-3.5 h-3.5" />}
+                  >
+                    {p.is_announcement ? 'Unpin' : 'Pin Announcement'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Appoint Community Moderators</h3>
+            <div className="space-y-2">
+              {members.map((usr) => (
+                <div key={usr.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                  <div className="flex items-center space-x-3">
+                    <Avatar name={usr.display_name} src={usr.avatar_url} size="sm" />
+                    <div>
+                      <p className="font-bold text-slate-900 dark:text-slate-100">{usr.display_name}</p>
+                      <p className="text-[10px] text-slate-400">Role: {usr.role}</p>
+                    </div>
+                  </div>
+                  {usr.role === 'user' && (
+                    <Button size="sm" variant="outline" onClick={() => handlePromoteMod(usr.id)} leftIcon={<UserCheck className="w-3.5 h-3.5" />}>
+                      Promote to Mod
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Create Post Dialog */}
-      <Dialog isOpen={createPostOpen} onClose={() => setCreatePostOpen(false)} title="Create Post">
+      <Dialog isOpen={createPostOpen} onClose={() => setCreatePostOpen(false)} title="Create Community Post">
         <div className="space-y-4">
           <Input label="Post Title" placeholder="Title..." value={postTitle} onChange={(e) => setPostTitle(e.target.value)} />
           <Textarea label="Body Content" placeholder="Share your update or lesson..." value={postBody} onChange={(e) => setPostBody(e.target.value)} />
           <Input label="Image URL (Optional)" placeholder="https://..." value={postMedia} onChange={(e) => setPostMedia(e.target.value)} />
+          
+          <label className="flex items-center space-x-2 text-xs font-semibold text-slate-300 cursor-pointer pt-1">
+            <input type="checkbox" checked={isAnnouncement} onChange={(e) => setIsAnnouncement(e.target.checked)} className="rounded border-slate-700 bg-slate-900 text-emerald-600" />
+            <span>Pin as Official Community Announcement</span>
+          </label>
+
           <div className="flex justify-end space-x-3 pt-3">
             <Button variant="outline" onClick={() => setCreatePostOpen(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleCreatePost}>Publish Post</Button>
