@@ -161,7 +161,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             {!isCollapsed && (
               <div className="min-w-0 flex-1 animate-fade-in">
                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate">
-                  Tewedada <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">ET</span>
+                  Egna <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">እኛ</span>
                 </h1>
                 <p className="text-[10px] text-slate-500 font-medium truncate">Accountability & Community</p>
               </div>

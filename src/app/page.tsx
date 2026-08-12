@@ -16,9 +16,9 @@ export default function LandingPage() {
             🇪🇹
           </div>
           <div>
-            <span className="text-lg font-bold tracking-tight text-white">Tewedada</span>
+            <span className="text-lg font-bold tracking-tight text-white">Egna</span>
             <span className="ml-2 text-xs font-semibold text-emerald-400 border border-emerald-800 bg-emerald-950/60 px-2 py-0.5 rounded-full">
-              Ethiopia
+              እኛ
             </span>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 mt-20 py-8 text-center text-xs text-slate-500">
-        <p>© 2026 Tewedada — Ethiopia Accountability, Learning & Community Platform</p>
+        <p>© 2026 Egna (እኛ) — Ethiopia Accountability, Learning & Community Platform</p>
       </footer>
     </div>
   );
