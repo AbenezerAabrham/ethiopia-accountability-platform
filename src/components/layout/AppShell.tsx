@@ -23,7 +23,11 @@ import {
   Languages,
   Inbox,
   Sparkles,
-  Users
+  Users,
+  Crown,
+  Building2,
+  CheckCircle2,
+  Menu
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -60,8 +64,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const t = DICTIONARY[currentLang] || DICTIONARY.en;
 
-  // Current logged in user (Mocked admin user for demonstration)
-  const user = INITIAL_PROFILES[0]; // Abebe Kebede (role: admin)
+  // Current logged in user (Mocked CEO & Founder for demonstration)
+  const user = INITIAL_PROFILES[0]; // Abebe Kebede (role: ceo_founder)
 
   useEffect(() => {
     const lang = getStoredLanguage();
@@ -134,6 +138,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   ];
 
   const adminNav = [
+    { label: 'Verification Authority', href: '/admin/verification', icon: Crown, badge: 'CEO' },
     { label: t.nav.admin, href: '/admin', icon: ShieldAlert, badge: '1' },
     { label: 'Claim Admin Key', href: '/admin/claim', icon: Key },
   ];
@@ -169,13 +174,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setOfflineQueueOpen(true)}
-              className="underline text-amber-100 hover:text-white text-[11px] font-bold"
+              className="underline text-amber-100 hover:text-white text-[11px] font-bold cursor-pointer"
             >
               View Queue ({queuedItems.length})
             </button>
             <button
               onClick={() => setDataSaver(!dataSaver)}
-              className="underline text-amber-100 hover:text-white text-[11px]"
+              className="underline text-amber-100 hover:text-white text-[11px] cursor-pointer"
             >
               {dataSaver ? 'Disable Data Saver' : 'Enable Data Saver'}
             </button>
@@ -183,36 +188,47 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </div>
       )}
 
-      {/* Desktop Retractable Sidebar Navigation */}
+      {/* Desktop Retractable Sidebar Navigation - Clean Icon Rail (w-16) vs Expanded (w-64) */}
       <aside
-        className={`hidden md:flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shrink-0 sticky top-0 h-screen transition-all duration-300 z-30 ${
-          isCollapsed ? 'w-20' : 'w-64'
+        className={`hidden md:flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 sticky top-0 h-screen transition-all duration-300 z-30 overflow-x-hidden ${
+          isCollapsed ? 'w-16 p-2' : 'w-64 p-3'
         } ${(!isOnline || dataSaver) ? 'pt-8' : ''}`}
       >
-        {/* Sidebar Header & Brand */}
-        <div className="flex items-center justify-between px-2 py-3 mb-4 border-b border-slate-100 dark:border-slate-800/80">
-          <Link href="/home" className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0">
-              🇪🇹
-            </div>
-            {!isCollapsed && (
-              <div className="min-w-0 flex-1 animate-fade-in">
-                <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate">
-                  Egna <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">እኛ</span>
-                </h1>
-                <p className="text-[10px] text-slate-500 font-medium truncate">{t.appTagline}</p>
+        {/* Sidebar Header & Brand (Pixel-perfect when collapsed: no cut-off!) */}
+        <div
+          className={`flex items-center mb-4 border-b border-slate-100 dark:border-slate-800/80 ${
+            isCollapsed ? 'justify-center py-2.5 px-0' : 'justify-between px-2 py-3'
+          }`}
+        >
+          {isCollapsed ? (
+            <Link href="/home" className="flex items-center justify-center" title="Egna (እኛ)">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl shadow-sm hover:scale-105 transition-transform">
+                🇪🇹
               </div>
-            )}
-          </Link>
+            </Link>
+          ) : (
+            <>
+              <Link href="/home" className="flex items-center space-x-3 overflow-hidden min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0">
+                  🇪🇹
+                </div>
+                <div className="min-w-0 flex-1 animate-fade-in">
+                  <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate">
+                    Egna <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold font-ethiopic">እኛ</span>
+                  </h1>
+                  <p className="text-[10px] text-slate-500 font-medium truncate">{t.appTagline}</p>
+                </div>
+              </Link>
 
-          {/* Retract / Expand Sidebar Button */}
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            title={isCollapsed ? 'Expand Sidebar' : 'Retract Sidebar'}
-          >
-            {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-          </button>
+              <button
+                onClick={toggleSidebar}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                title="Retract Sidebar"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Navigation Items */}
@@ -230,8 +246,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 key={item.href}
                 href={item.href}
                 title={isCollapsed ? item.label : undefined}
-                className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  isCollapsed ? 'justify-center' : ''
+                className={`flex items-center space-x-3 rounded-lg text-sm font-medium transition-all ${
+                  isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5'
                 } ${
                   active
                     ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold'
@@ -248,8 +264,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <div className="pt-6">
             {!isCollapsed && (
               <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                <span>Security & Admin</span>
-                {user.role === 'admin' && <span className="text-[9px] text-amber-400 font-extrabold uppercase">Verified Admin</span>}
+                <span>Executive & Admin</span>
+                <span className="text-[9px] text-amber-400 font-extrabold uppercase">👑 CEO Clearance</span>
               </div>
             )}
 
@@ -261,8 +277,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   key={item.href}
                   href={item.href}
                   title={isCollapsed ? item.label : undefined}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    isCollapsed ? 'justify-center' : ''
+                  className={`flex items-center justify-between rounded-lg text-sm font-medium transition-all ${
+                    isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5'
                   } ${
                     active
                       ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold'
@@ -284,22 +300,33 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </div>
         </nav>
 
-        {/* User Profile Card in Retractable Sidebar */}
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        {/* Sidebar Bottom Controls: Retract toggle when collapsed + User Profile */}
+        <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+          {isCollapsed && (
+            <button
+              onClick={toggleSidebar}
+              className="w-full flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Expand Sidebar"
+            >
+              <PanelLeftOpen className="w-4 h-4" />
+            </button>
+          )}
+
           <Link
             href={`/profile/${user.username}`}
             className={`flex items-center space-x-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
               isCollapsed ? 'justify-center' : ''
             }`}
+            title={`${user.display_name} (@${user.username})`}
           >
             <Avatar name={user.display_name} src={user.avatar_url} size="sm" />
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-1">
                   <p className="text-xs font-bold truncate text-slate-900 dark:text-slate-100">{user.display_name}</p>
-                  {user.role === 'admin' && <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                  <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 </div>
-                <p className="text-[10px] text-slate-500 truncate">@{user.username} • {user.sub_city || 'Bole'}</p>
+                <p className="text-[10px] text-slate-500 truncate">@{user.username} • CEO / Founder</p>
               </div>
             )}
           </Link>
@@ -308,28 +335,34 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 mb-16 md:mb-0">
-        {/* Top Header Bar */}
+        {/* Top Header Bar with Sidebar Toggle Button */}
         <header className={`sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between ${(!isOnline || dataSaver) ? 'mt-6' : ''}`}>
-          <div className="flex items-center space-x-3 md:hidden">
-            <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
-              🇪🇹
-            </div>
-            <span className="font-bold text-sm tracking-tight">Egna (እኛ)</span>
-          </div>
+          <div className="flex items-center space-x-3">
+            {/* Header Sidebar Toggle Button */}
+            <button
+              onClick={toggleSidebar}
+              className="hidden md:flex p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title={isCollapsed ? 'Expand Sidebar' : 'Retract Sidebar'}
+            >
+              {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+            </button>
 
-          <div className="hidden md:flex items-center space-x-2 text-xs font-medium text-slate-500">
-            <span>Ethiopian Accountability Platform</span>
-            <span>•</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Production Alpha</span>
-            {user.role === 'admin' && (
-              <>
-                <span>•</span>
-                <span className="text-amber-400 font-bold flex items-center space-x-1 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
-                  <ShieldCheck className="w-3 h-3" />
-                  <span>Admin Session</span>
-                </span>
-              </>
-            )}
+            <div className="flex items-center space-x-2 md:hidden">
+              <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+                🇪🇹
+              </div>
+              <span className="font-bold text-sm tracking-tight">Egna (እኛ)</span>
+            </div>
+
+            <div className="hidden md:flex items-center space-x-2 text-xs font-medium text-slate-500">
+              <span>Ethiopian Accountability Platform</span>
+              <span>•</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Production Alpha</span>
+              <span className="text-amber-400 font-bold flex items-center space-x-1 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
+                <Crown className="w-3 h-3 text-amber-400" />
+                <span>CEO Authority</span>
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -407,8 +440,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       <p className="text-[11px] text-slate-500">Don&apos;t forget your 1-hour Next.js practice routine today!</p>
                     </div>
                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200">
-                      <p className="font-semibold">🤝 Partner Activity</p>
-                      <p className="text-[11px] text-slate-500">Meron Tadesse completed Forex Trade Journaling.</p>
+                      <p className="font-semibold">👑 Executive Notification</p>
+                      <p className="text-[11px] text-slate-500">1 new university organization verification request awaiting review.</p>
                     </div>
                   </div>
                 </div>

@@ -1,22 +1,23 @@
 export * from './types';
-import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report, Squad } from './types';
+import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report, Squad, VerificationRequest } from './types';
 
-// Default mock Ethiopian users with Sub-city and Trust Tier attributes
+// Default mock Ethiopian users with Sub-city, Verification Badges, and Trust Tier attributes
 export const INITIAL_PROFILES: Profile[] = [
   {
     id: 'usr-1',
     username: 'abebe_k',
     display_name: 'Abebe Kebede',
-    bio: 'Software engineer in Addis Ababa building open-source & learning Rust.',
+    bio: 'Platform Creator & Software engineer building Egna for Ethiopia.',
     avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     location_region: 'Addis Ababa',
     sub_city: 'Bole',
     university_campus: 'AAU (Addis Ababa University)',
     active_window: 'Early Bird (5 AM – 8 AM)',
     trust_tier: 'tier_3_leader',
-    experience_summary: 'Experienced Full-Stack Dev',
-    role: 'admin',
-    reputation_score: 420,
+    verification_badge: 'ceo_founder',
+    experience_summary: 'Platform Founder & Executive',
+    role: 'ceo_founder',
+    reputation_score: 1250,
     created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
   },
   {
@@ -29,9 +30,10 @@ export const INITIAL_PROFILES: Profile[] = [
     university_campus: 'Bahir Dar University',
     active_window: 'Morning Focus (8 AM – 12 PM)',
     trust_tier: 'tier_2_verified',
-    experience_summary: 'Intermediate Trader',
+    verification_badge: 'verified_admin',
+    experience_summary: 'Trust & Safety Moderator',
     role: 'moderator',
-    reputation_score: 280,
+    reputation_score: 480,
     created_at: new Date(Date.now() - 60 * 86400000).toISOString(),
   },
   {
@@ -44,9 +46,10 @@ export const INITIAL_PROFILES: Profile[] = [
     university_campus: 'Hawassa University',
     active_window: 'Early Bird (5 AM – 8 AM)',
     trust_tier: 'tier_2_verified',
+    verification_badge: 'verified_partner',
     experience_summary: 'Calisthenics Coach',
     role: 'user',
-    reputation_score: 190,
+    reputation_score: 310,
     created_at: new Date(Date.now() - 40 * 86400000).toISOString(),
   },
   {
@@ -60,6 +63,7 @@ export const INITIAL_PROFILES: Profile[] = [
     university_campus: 'ASTU (Adama Science & Tech)',
     active_window: 'Night Owl (10 PM – 1 AM)',
     trust_tier: 'tier_2_verified',
+    verification_badge: 'none',
     experience_summary: 'Security Enthusiast',
     role: 'user',
     reputation_score: 150,
@@ -67,7 +71,39 @@ export const INITIAL_PROFILES: Profile[] = [
   }
 ];
 
+export const INITIAL_VERIFICATION_REQUESTS: VerificationRequest[] = [
+  {
+    id: 'vr-1',
+    user_id: 'usr-3',
+    user_name: 'Samuel Alemu',
+    username: 'samuel_b',
+    user_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    type: 'individual_creator',
+    reason: 'Ethiopian Calisthenics community coach with 500+ active athletes across Hawassa & Addis Ababa.',
+    status: 'approved',
+    badge_requested: 'verified_partner',
+    submitted_at: '2 days ago',
+    reviewed_at: '1 day ago',
+    reviewed_by: 'Abebe Kebede (CEO)'
+  },
+  {
+    id: 'vr-2',
+    user_id: 'usr-4',
+    user_name: 'Hiwot Mengistu',
+    username: 'hiwot_m',
+    user_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    type: 'university_faculty',
+    organization_name: 'ASTU Cybersecurity Club',
+    official_email: 'hiwot.m@astu.edu.et',
+    reason: 'Official faculty club lead organizing campus CTF challenges and study accountability circles.',
+    status: 'pending',
+    badge_requested: 'verified_org',
+    submitted_at: '3 hours ago'
+  }
+];
+
 export const INITIAL_COMMUNITIES: Community[] = [
+
   {
     id: 'com-1',
     name: 'Python & Next.js Ethiopia',

@@ -1,8 +1,10 @@
 // Types for Ethiopia Accountability Platform
 
-export type UserRole = 'user' | 'moderator' | 'admin';
+export type UserRole = 'user' | 'moderator' | 'admin' | 'ceo_founder';
 
 export type TrustTier = 'tier_1_new' | 'tier_2_verified' | 'tier_3_leader';
+
+export type VerificationBadge = 'none' | 'ceo_founder' | 'verified_admin' | 'verified_org' | 'verified_partner';
 
 export type SubCity =
   | 'Bole'
@@ -33,6 +35,24 @@ export type ActiveWindow =
   | 'Evening Wind-down (6 PM – 9 PM)'
   | 'Night Owl (10 PM – 1 AM)';
 
+export interface VerificationRequest {
+  id: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string;
+  username: string;
+  type: 'individual_creator' | 'organization' | 'executive_ceo' | 'university_faculty';
+  organization_name?: string;
+  official_email?: string;
+  document_url?: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  badge_requested: VerificationBadge;
+  submitted_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+}
+
 export interface Profile {
   id: string;
   username: string;
@@ -44,11 +64,14 @@ export interface Profile {
   university_campus?: UniversityCampus;
   active_window?: ActiveWindow;
   trust_tier?: TrustTier;
+  verification_badge?: VerificationBadge;
+  organization?: string;
   experience_summary?: string;
   role: UserRole;
   reputation_score: number;
   created_at: string;
 }
+
 
 export interface Squad {
   id: string;
