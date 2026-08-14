@@ -127,7 +127,7 @@ export default function CommunityDetailPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                   active ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'
                 }`}

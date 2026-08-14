@@ -1,7 +1,7 @@
 export * from './types';
-import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Message, Report, NotificationItem, Comment } from './types';
+import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report, Squad } from './types';
 
-// Default mock Ethiopian users
+// Default mock Ethiopian users with Sub-city and Trust Tier attributes
 export const INITIAL_PROFILES: Profile[] = [
   {
     id: 'usr-1',
@@ -10,6 +10,10 @@ export const INITIAL_PROFILES: Profile[] = [
     bio: 'Software engineer in Addis Ababa building open-source & learning Rust.',
     avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     location_region: 'Addis Ababa',
+    sub_city: 'Bole',
+    university_campus: 'AAU (Addis Ababa University)',
+    active_window: 'Early Bird (5 AM – 8 AM)',
+    trust_tier: 'tier_3_leader',
     experience_summary: 'Experienced Full-Stack Dev',
     role: 'admin',
     reputation_score: 420,
@@ -22,6 +26,9 @@ export const INITIAL_PROFILES: Profile[] = [
     bio: 'Forex trader & accounting enthusiast. Focus on risk management.',
     avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
     location_region: 'Bahr Dar',
+    university_campus: 'Bahir Dar University',
+    active_window: 'Morning Focus (8 AM – 12 PM)',
+    trust_tier: 'tier_2_verified',
     experience_summary: 'Intermediate Trader',
     role: 'moderator',
     reputation_score: 280,
@@ -34,6 +41,9 @@ export const INITIAL_PROFILES: Profile[] = [
     bio: 'Calisthenics & fitness athlete. 5am workout routine.',
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     location_region: 'Hawassa',
+    university_campus: 'Hawassa University',
+    active_window: 'Early Bird (5 AM – 8 AM)',
+    trust_tier: 'tier_2_verified',
     experience_summary: 'Calisthenics Coach',
     role: 'user',
     reputation_score: 190,
@@ -43,9 +53,13 @@ export const INITIAL_PROFILES: Profile[] = [
     id: 'usr-4',
     username: 'hiwot_m',
     display_name: 'Hiwot Mengistu',
-    bio: 'Cybersecurity learner & Bible study leader.',
+    bio: 'Cybersecurity learner & Bible study leader in Kirkos.',
     avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
-    location_region: 'Adama',
+    location_region: 'Addis Ababa',
+    sub_city: 'Kirkos',
+    university_campus: 'ASTU (Adama Science & Tech)',
+    active_window: 'Night Owl (10 PM – 1 AM)',
+    trust_tier: 'tier_2_verified',
     experience_summary: 'Security Enthusiast',
     role: 'user',
     reputation_score: 150,
@@ -60,6 +74,8 @@ export const INITIAL_COMMUNITIES: Community[] = [
     slug: 'python-nextjs-ethiopia',
     description: 'Community of Ethiopian developers practicing full-stack web engineering & accountability.',
     category: 'Programming',
+    sub_city: 'Bole',
+    university_campus: 'AAU (Addis Ababa University)',
     banner_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
     is_verified: true,
     is_private: false,
@@ -73,6 +89,7 @@ export const INITIAL_COMMUNITIES: Community[] = [
     slug: 'ethiopia-fitness',
     description: 'Daily bodyweight workouts, nutrition tips, and streak check-ins across Ethiopian cities.',
     category: 'Fitness',
+    sub_city: 'Kirkos',
     banner_url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
     is_verified: true,
     is_private: false,
@@ -99,6 +116,7 @@ export const INITIAL_COMMUNITIES: Community[] = [
     slug: 'addis-tech-founders',
     description: 'Building sustainable products for local and global problems from Ethiopia.',
     category: 'Business',
+    sub_city: 'Yeka',
     banner_url: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
     is_verified: true,
     is_private: false,
@@ -106,6 +124,62 @@ export const INITIAL_COMMUNITIES: Community[] = [
     member_count: 189,
     created_at: new Date(Date.now() - 30 * 86400000).toISOString()
   }
+];
+
+// Initial 5-8 Person Micro-Squads
+export const INITIAL_SQUADS: Squad[] = [
+  {
+    id: 'sqd-1',
+    name: 'Bole 5 AM Calisthenics Circle',
+    slug: 'bole-5am-calisthenics',
+    category: 'Fitness',
+    focus: 'Daily 5:15 AM bodyweight workout & streak check-ins',
+    max_members: 6,
+    current_members_count: 5,
+    sub_city: 'Bole',
+    active_window: 'Early Bird (5 AM – 8 AM)',
+    leader_id: 'usr-3',
+    leader_name: 'Samuel Alemu',
+    leader_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    total_squad_streak: 28,
+    is_private: false,
+    created_at: new Date(Date.now() - 25 * 86400000).toISOString(),
+  },
+  {
+    id: 'sqd-2',
+    name: 'AAU 4-Kilo Night Coders',
+    slug: 'aau-4kilo-night-coders',
+    category: 'Programming',
+    focus: 'Nightly 10 PM Next.js & Rust problem solving group',
+    max_members: 5,
+    current_members_count: 4,
+    sub_city: 'Arada',
+    university_campus: 'AAU (Addis Ababa University)',
+    active_window: 'Night Owl (10 PM – 1 AM)',
+    leader_id: 'usr-1',
+    leader_name: 'Abebe Kebede',
+    leader_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    total_squad_streak: 42,
+    is_private: false,
+    created_at: new Date(Date.now() - 35 * 86400000).toISOString(),
+  },
+  {
+    id: 'sqd-3',
+    name: 'Kirkos Cybersecurity & Network Study',
+    slug: 'kirkos-cybersec-study',
+    category: 'Education',
+    focus: 'CCNA & Linux certification accountability',
+    max_members: 6,
+    current_members_count: 3,
+    sub_city: 'Kirkos',
+    active_window: 'Evening Wind-down (6 PM – 9 PM)',
+    leader_id: 'usr-4',
+    leader_name: 'Hiwot Mengistu',
+    leader_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    total_squad_streak: 15,
+    is_private: false,
+    created_at: new Date(Date.now() - 15 * 86400000).toISOString(),
+  },
 ];
 
 export const INITIAL_GOALS: Goal[] = [
@@ -162,8 +236,6 @@ export const INITIAL_ROUTINES: Routine[] = [
   }
 ];
 
-// Helper to seed recent consecutive checkins for streak demonstration
-const todayStr = new Date().toISOString().split('T')[0];
 const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 const twoDaysAgoStr = new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0];
 
@@ -177,7 +249,9 @@ export const INITIAL_CHECKINS: GoalCheckin[] = [
     completed_at: new Date(Date.now() - 86400000).toISOString(),
     status: 'completed',
     note: 'Completed database migration module and Supabase RLS security policies.',
-    evidence_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80'
+    evidence_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80',
+    evidence_size_formatted: '114 KB (97.6% compressed)',
+    ai_score: 0.96,
   },
   {
     id: 'chk-2',
@@ -197,7 +271,7 @@ export const INITIAL_CHECKINS: GoalCheckin[] = [
     scheduled_date: yesterdayStr,
     completed_at: new Date(Date.now() - 86400000).toISOString(),
     status: 'completed',
-    note: '100 pushups and 5 min plank.'
+    note: '100 pushups and 5 min plank at Bole stadium track.'
   }
 ];
 
@@ -292,7 +366,6 @@ export function calculateStreak(checkins: GoalCheckin[], routineId: string): { c
   let dateStr = checkDate.toISOString().split('T')[0];
   
   if (!uniqueDates.includes(dateStr)) {
-    // try yesterday
     checkDate.setDate(checkDate.getDate() - 1);
     dateStr = checkDate.toISOString().split('T')[0];
   }

@@ -15,10 +15,10 @@ export default function AdminPage() {
   ]);
 
   const handleResolve = (id: string, action: string) => {
-    setReports(reports.filter(r => r.id !== id));
-    setAuditLogs([
-      { id: `log-${Date.now()}`, action: `Moderator action: ${action}`, target: `Report #${id}`, time: 'Just now' },
-      ...auditLogs
+    setReports(prev => prev.filter(r => r.id !== id));
+    setAuditLogs(prev => [
+      { id: `log-${id}-${prev.length + 1}`, action: `Moderator action: ${action}`, target: `Report #${id}`, time: 'Just now' },
+      ...prev
     ]);
   };
 

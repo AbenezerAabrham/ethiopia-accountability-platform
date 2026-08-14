@@ -19,39 +19,61 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Key,
-  ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Languages,
+  Inbox,
+  Sparkles,
+  Users
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';
+import { Button } from '../ui/Button';
 import { INITIAL_PROFILES } from '@/lib/store';
-import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead, NotificationItem } from '@/lib/notifications';
-import { processOfflineQueue } from '@/lib/offline-queue';
+import { processOfflineQueue, subscribeQueueChanges, QueuedCheckin } from '@/lib/offline-queue';
+import { DICTIONARY, AppLanguage, getStoredLanguage, setStoredLanguage } from '@/lib/i18n';
+import { OfflineQueueModal } from '../ui/OfflineQueueModal';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
 
-  const [darkMode, setDarkMode] = useState(true);
+  const [currentLang, setCurrentLang] = useState<AppLanguage>('en');
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'light') return false;
+    }
+    return true;
+  });
   const [dataSaver, setDataSaver] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [offlineQueueOpen, setOfflineQueueOpen] = useState(false);
+  const [queuedItems, setQueuedItems] = useState<QueuedCheckin[]>([]);
 
   // Retractable Sidebar State
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('sidebar_collapsed');
+      return stored === 'true';
+    }
+    return false;
+  });
+
+  const t = DICTIONARY[currentLang] || DICTIONARY.en;
 
   // Current logged in user (Mocked admin user for demonstration)
-  const [user, setUser] = useState(INITIAL_PROFILES[0]); // Abebe Kebede (role: admin)
+  const user = INITIAL_PROFILES[0]; // Abebe Kebede (role: admin)
 
   useEffect(() => {
-    // Check stored sidebar state
-    const stored = localStorage.getItem('sidebar_collapsed');
-    if (stored === 'true') setIsCollapsed(true);
-
-    // Check stored theme state
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'light') {
-      setDarkMode(false);
-    }
+    const lang = getStoredLanguage();
+    setCurrentLang(lang);
+    document.documentElement.lang = lang;
+    document.documentElement.setAttribute('data-lang', lang);
   }, []);
+
+  const handleLanguageChange = (newLang: AppLanguage) => {
+    setCurrentLang(newLang);
+    setStoredLanguage(newLang);
+  };
 
   const toggleSidebar = () => {
     const next = !isCollapsed;
@@ -75,14 +97,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     }
   }, [darkMode]);
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [syncToast, setSyncToast] = useState<string | null>(null);
 
   useEffect(() => {
-    setNotifications(getNotifications());
-  }, []);
+    const unsubscribe = subscribeQueueChanges((items) => {
+      setQueuedItems(items);
+    });
 
-  useEffect(() => {
     const handleOnline = async () => {
       setIsOnline(true);
       const res = await processOfflineQueue();
@@ -92,29 +113,32 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       }
     };
     const handleOffline = () => setIsOnline(false);
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
     return () => {
+      unsubscribe();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
   const navItems = [
-    { label: 'Home', href: '/home', icon: Home },
-    { label: 'Discover', href: '/discover', icon: Compass },
-    { label: 'Goals', href: '/goals', icon: Target },
-    { label: 'Activity', href: '/activity', icon: Activity },
-    { label: 'Messages', href: '/messages', icon: MessageSquare },
-    { label: 'Challenges', href: '/challenges', icon: Trophy },
+    { label: t.nav.home, href: '/home', icon: Home },
+    { label: t.nav.discover, href: '/discover', icon: Compass },
+    { label: t.nav.goals, href: '/goals', icon: Target },
+    { label: t.nav.activity, href: '/activity', icon: Activity },
+    { label: t.nav.messages, href: '/messages', icon: MessageSquare },
+    { label: t.nav.challenges, href: '/challenges', icon: Trophy },
   ];
 
   const adminNav = [
-    { label: 'Moderation Admin', href: '/admin', icon: ShieldAlert, badge: '1' },
+    { label: t.nav.admin, href: '/admin', icon: ShieldAlert, badge: '1' },
     { label: 'Claim Admin Key', href: '/admin/claim', icon: Key },
   ];
 
-  const isPublicPage = pathname === '/' || pathname === '/onboarding' || pathname === '/signup' || pathname === '/login';
+  const isPublicPage = pathname === '/' || pathname === '/signup' || pathname === '/login';
 
   if (isPublicPage) {
     return (
@@ -126,23 +150,36 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
-      {/* Offline / Data Saver Status Banner */}
-      {(!isOnline || dataSaver) && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-600 text-white text-xs font-semibold px-4 py-1 flex items-center justify-between shadow-md">
+      {/* Offline / Data Saver / Sync Toast Status Banner */}
+      {syncToast && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-emerald-600 text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between shadow-md animate-fade-in">
+          <span>{syncToast}</span>
+        </div>
+      )}
+      {(!isOnline || dataSaver) && !syncToast && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-600 text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between shadow-md">
           <div className="flex items-center space-x-2">
             {!isOnline ? <WifiOff className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5" />}
             <span>
               {!isOnline
-                ? 'Offline Mode: Changes will sync automatically when back online'
-                : 'Data Saver Active: Low-bandwidth optimization enabled'}
+                ? t.offline.offlineMode
+                : t.offline.dataSaverActive}
             </span>
           </div>
-          <button
-            onClick={() => setDataSaver(!dataSaver)}
-            className="underline text-amber-100 hover:text-white text-[11px]"
-          >
-            {dataSaver ? 'Disable Data Saver' : 'Enable Data Saver'}
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setOfflineQueueOpen(true)}
+              className="underline text-amber-100 hover:text-white text-[11px] font-bold"
+            >
+              View Queue ({queuedItems.length})
+            </button>
+            <button
+              onClick={() => setDataSaver(!dataSaver)}
+              className="underline text-amber-100 hover:text-white text-[11px]"
+            >
+              {dataSaver ? 'Disable Data Saver' : 'Enable Data Saver'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -163,7 +200,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate">
                   Egna <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">እኛ</span>
                 </h1>
-                <p className="text-[10px] text-slate-500 font-medium truncate">Accountability & Community</p>
+                <p className="text-[10px] text-slate-500 font-medium truncate">{t.appTagline}</p>
               </div>
             )}
           </Link>
@@ -171,7 +208,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           {/* Retract / Expand Sidebar Button */}
           <button
             onClick={toggleSidebar}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             title={isCollapsed ? 'Expand Sidebar' : 'Retract Sidebar'}
           >
             {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
@@ -262,7 +299,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <p className="text-xs font-bold truncate text-slate-900 dark:text-slate-100">{user.display_name}</p>
                   {user.role === 'admin' && <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                 </div>
-                <p className="text-[10px] text-slate-500 truncate">@{user.username}</p>
+                <p className="text-[10px] text-slate-500 truncate">@{user.username} • {user.sub_city || 'Bole'}</p>
               </div>
             )}
           </Link>
@@ -272,18 +309,18 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 mb-16 md:mb-0">
         {/* Top Header Bar */}
-        <header className={`sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between ${(!isOnline || dataSaver) ? 'mt-6' : ''}`}>
+        <header className={`sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between ${(!isOnline || dataSaver) ? 'mt-6' : ''}`}>
           <div className="flex items-center space-x-3 md:hidden">
             <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
               🇪🇹
             </div>
-            <span className="font-bold text-sm tracking-tight">Tewedada</span>
+            <span className="font-bold text-sm tracking-tight">Egna (እኛ)</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-2 text-xs font-medium text-slate-500">
             <span>Ethiopian Accountability Platform</span>
             <span>•</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Live Alpha</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Production Alpha</span>
             {user.role === 'admin' && (
               <>
                 <span>•</span>
@@ -296,11 +333,62 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Language Switcher Selector */}
+            <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 p-0.5 text-xs font-semibold">
+              <button
+                onClick={() => handleLanguageChange('en')}
+                className={`px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                  currentLang === 'en'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+                title="English"
+              >
+                EN
+              </button>
+              <button
+                onClick={() => handleLanguageChange('am')}
+                className={`px-2 py-1 rounded-md transition-colors cursor-pointer font-ethiopic ${
+                  currentLang === 'am'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+                title="አማርኛ (Amharic)"
+              >
+                አማ
+              </button>
+              <button
+                onClick={() => handleLanguageChange('om')}
+                className={`px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                  currentLang === 'om'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+                title="Afaan Oromoo"
+              >
+                OM
+              </button>
+            </div>
+
+            {/* Offline Queue Drawer Button */}
+            <button
+              onClick={() => setOfflineQueueOpen(true)}
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative cursor-pointer"
+              title="Offline Sync Queue"
+            >
+              <Inbox className="w-4 h-4" />
+              {queuedItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-amber-500 text-white text-[9px] font-bold flex items-center justify-center">
+                  {queuedItems.length}
+                </span>
+              )}
+            </button>
+
             {/* Notifications Button */}
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
+                className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative cursor-pointer"
               >
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -330,7 +418,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             {/* Dark Mode Toggle */}
             <button
               onClick={handleToggleTheme}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title="Toggle Theme"
             >
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
@@ -339,7 +427,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             {/* Data Saver Mode Toggle */}
             <button
               onClick={() => setDataSaver(!dataSaver)}
-              className={`p-2 rounded-lg text-xs font-semibold transition-colors ${
+              className={`p-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 dataSaver
                   ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -361,6 +449,17 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           {children}
         </main>
       </div>
+
+      {/* Offline Queue Modal */}
+      <OfflineQueueModal
+        isOpen={offlineQueueOpen}
+        onClose={() => setOfflineQueueOpen(false)}
+        isOnline={isOnline}
+        onSyncComplete={(count) => {
+          setSyncToast(`Synced ${count} check-in(s) to database!`);
+          setTimeout(() => setSyncToast(null), 4000);
+        }}
+      />
 
       {/* Mobile Bottom Navigation (Fixed) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 z-50 flex items-center justify-around py-2 px-1">

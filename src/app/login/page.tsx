@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowRight, Mail, Lock, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { createClient } from '@/lib/supabase/client';
 
-export default function LoginPage() {
+// Inner component reads useSearchParams — must be inside Suspense
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next') ?? '/home';
   const supabase = createClient();
 
   const [email, setEmail] = useState('');
@@ -38,14 +41,11 @@ export default function LoginPage() {
       });
 
       if (signInError) {
-        if (signInError.message.includes('placeholder') || signInError.message.includes('fetch')) {
-          router.push('/home');
-          return;
-        }
         setError(signInError.message);
         setLoading(false);
       } else {
-        router.push('/home');
+        router.push(next);
+        router.refresh();
       }
     } else {
       const { error: magicError } = await supabase.auth.signInWithOtp({
@@ -56,11 +56,6 @@ export default function LoginPage() {
       });
 
       if (magicError) {
-        if (magicError.message.includes('placeholder') || magicError.message.includes('fetch')) {
-          setMagicLinkSent(true);
-          setLoading(false);
-          return;
-        }
         setError(magicError.message);
         setLoading(false);
       } else {
@@ -167,5 +162,18 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper required by Next.js 15 for useSearchParams()
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -2,6 +2,37 @@
 
 export type UserRole = 'user' | 'moderator' | 'admin';
 
+export type TrustTier = 'tier_1_new' | 'tier_2_verified' | 'tier_3_leader';
+
+export type SubCity =
+  | 'Bole'
+  | 'Kirkos'
+  | 'Yeka'
+  | 'Arada'
+  | 'Gullele'
+  | 'Lideta'
+  | 'Nifas Silk-Lafto'
+  | 'Kolfe Keranio'
+  | 'Akaky Kaliti'
+  | 'Lemi Kura';
+
+export type UniversityCampus =
+  | 'AAU (Addis Ababa University)'
+  | 'ASTU (Adama Science & Tech)'
+  | 'Jimma University'
+  | 'Hawassa University'
+  | 'Bahir Dar University'
+  | 'Dire Dawa University'
+  | 'Mekelle University'
+  | 'Haramaya University';
+
+export type ActiveWindow =
+  | 'Early Bird (5 AM – 8 AM)'
+  | 'Morning Focus (8 AM – 12 PM)'
+  | 'Afternoon Sprint (1 PM – 5 PM)'
+  | 'Evening Wind-down (6 PM – 9 PM)'
+  | 'Night Owl (10 PM – 1 AM)';
+
 export interface Profile {
   id: string;
   username: string;
@@ -9,10 +40,43 @@ export interface Profile {
   bio: string;
   avatar_url: string;
   location_region?: string;
+  sub_city?: SubCity;
+  university_campus?: UniversityCampus;
+  active_window?: ActiveWindow;
+  trust_tier?: TrustTier;
   experience_summary?: string;
   role: UserRole;
   reputation_score: number;
   created_at: string;
+}
+
+export interface Squad {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  focus: string;
+  max_members: number; // 5-8 members
+  current_members_count: number;
+  sub_city?: SubCity;
+  university_campus?: UniversityCampus;
+  active_window: ActiveWindow;
+  leader_id: string;
+  leader_name: string;
+  leader_avatar: string;
+  total_squad_streak: number;
+  is_private: boolean;
+  created_at: string;
+}
+
+export interface SquadMember {
+  id: string;
+  squad_id: string;
+  user_id: string;
+  user?: Profile;
+  joined_at: string;
+  checked_in_today: boolean;
+  current_streak: number;
 }
 
 export interface Interest {
@@ -36,6 +100,8 @@ export interface Community {
   description: string;
   category: string;
   banner_url?: string;
+  sub_city?: SubCity;
+  university_campus?: UniversityCampus;
   is_verified: boolean;
   is_private: boolean;
   creator_id: string;
@@ -120,6 +186,10 @@ export interface GoalCheckin {
   status: 'completed' | 'skipped' | 'missed';
   note?: string;
   evidence_url?: string;
+  evidence_size_formatted?: string;
+  ai_score?: number;
+  privacy_blurred?: boolean;
+  squad_id?: string;
 }
 
 export interface Challenge {

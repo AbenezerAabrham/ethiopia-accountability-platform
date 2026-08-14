@@ -1,52 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
 
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
   :root {
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-ethiopic: 'Noto Sans Ethiopic', 'Abyssinica SIL', 'Nyala', var(--font-sans);
+
+    /* WCAG AAA High-Contrast Light Mode Tokens for Direct Outdoor Sunlight Visibility */
     --bg-app: #f8fafc;
     --bg-surface: #ffffff;
     --bg-surface-secondary: #f1f5f9;
-    --border-color: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    --accent: #059669; /* Emerald Ethiopian Green */
-    --accent-hover: #047857;
+    --border-color: #cbd5e1;
+    --text-primary: #020617; /* Deepest slate for outdoor contrast */
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --accent: #047857; /* Deep Emerald Ethiopian Green */
+    --accent-hover: #065f46;
     --accent-light: #ecfdf5;
-    --warning: #d97706; /* Ethiopian Warm Gold */
-    --danger: #dc2626;
-    --success: #10b981;
-    --ring-focus: rgba(5, 150, 105, 0.25);
+    --warning: #b45309; /* Ethiopian Warm Gold */
+    --danger: #b91c1c;
+    --success: #047857;
+    --ring-focus: rgba(4, 120, 87, 0.35);
   }
 
   .dark {
-    --bg-app: #090d16;
-    --bg-surface: #111827;
-    --bg-surface-secondary: #1f2937;
-    --border-color: #1f2937;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --text-muted: #6b7280;
+    /* WCAG AAA High-Contrast Dark Mode Tokens (No washed out grays) */
+    --bg-app: #030712;
+    --bg-surface: #0f172a;
+    --bg-surface-secondary: #1e293b;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
     --accent: #10b981;
     --accent-hover: #059669;
-    --accent-light: rgba(16, 185, 129, 0.12);
+    --accent-light: rgba(16, 185, 129, 0.16);
     --warning: #f59e0b;
     --danger: #ef4444;
     --success: #10b981;
-    --ring-focus: rgba(16, 185, 129, 0.3);
+    --ring-focus: rgba(16, 185, 129, 0.4);
   }
 }
 
 body {
   background-color: var(--bg-app);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
   min-height: 100vh;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ge'ez / Amharic & Afaan Oromoo Multilingual Font Hierarchy & Leading */
+:lang(am),
+[data-lang="am"],
+.font-ethiopic {
+  font-family: var(--font-ethiopic);
+  line-height: 1.65; /* Amharic glyphs require larger line height to avoid clipping top/bottom diacritics */
+  letter-spacing: 0.01em;
+}
+
+:lang(om),
+[data-lang="om"] {
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+
+/* Mobile Low-Bandwidth & GPU Battery Optimization */
+@media (max-width: 768px) {
+  /* Disable heavy GPU glassmorphism filters on mobile devices to preserve framerates */
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: var(--bg-surface) !important;
+  }
 }
 
 /* Custom scrollbars */

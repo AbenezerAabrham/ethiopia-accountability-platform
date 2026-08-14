@@ -50,15 +50,11 @@ export default function SignUpPage() {
       });
 
       if (signUpError) {
-        // Fallback for development if env keys are placeholder
-        if (signUpError.message.includes('placeholder') || signUpError.message.includes('fetch')) {
-          router.push('/onboarding');
-          return;
-        }
         setError(signUpError.message);
         setLoading(false);
       } else {
         router.push('/onboarding');
+        router.refresh();
       }
     } else {
       // Email OTP / Magic Link
@@ -70,11 +66,6 @@ export default function SignUpPage() {
       });
 
       if (magicError) {
-        if (magicError.message.includes('placeholder') || magicError.message.includes('fetch')) {
-          setMagicLinkSent(true);
-          setLoading(false);
-          return;
-        }
         setError(magicError.message);
         setLoading(false);
       } else {

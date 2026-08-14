@@ -33,7 +33,16 @@ Stores user profile information, display name, username, region, role (`user`, `
 - `comments`: Direct parent-child comments under posts.
 
 ### `conversations` & `messages`
-- Direct messaging store enforcing membership authorization checks.
+- Direct messaging store enforcing membership authorization checks and link guards.
+
+### `squads` & `squad_members` (New in Migration 20260815)
+- `squads`: 5-8 person micro-accountability circles with shared daily streaks, active schedule window (`Early Bird`, `Night Owl`), sub-city, and university campus.
+- `squad_members`: Membership records, daily check-in states, and personal streak within the squad.
+
+### `proof_verifications` & `proof_vouches` (New in Migration 20260815)
+- `proof_verifications`: Client-compressed evidence logs, EXIF timestamp validation flags, AI vision pre-screening confidence scores, and privacy face-blur flags.
+- `proof_vouches`: Incentivized peer audit records with 10 Rep point staking and +15 Rep consensus rewards.
 
 ### `reports` & `moderation_actions` & `audit_logs`
-- System moderation tracking for reports (spam, scam, harassment, misinformation) and moderator audit history.
+- System moderation tracking for reports (spam, scam, harassment, misinformation), regex link guard violations, and moderator audit history.
+

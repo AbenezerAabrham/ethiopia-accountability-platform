@@ -45,9 +45,20 @@ The platform has been built, tested, and elevated to production status in full c
 
 ### ✅ Sprint 7: PWA, Offline Queueing & Notification Engine
 - [x] Web App Manifest (`public/manifest.json`) for standalone mobile PWA installation.
-- [x] Offline Check-In Queue (`src/lib/offline-queue.ts`) using local storage queueing on degraded 3G networks.
-- [x] Automatic Network Sync Manager: Auto-flushes check-ins upon network restoration.
+- [x] Offline Check-In Queue (`src/lib/offline-queue.ts`) using IndexedDB (`EgnaOfflineDB`) transactional queue on degraded 3G/4G networks.
+- [x] Automatic Network Sync Manager: Auto-flushes check-ins upon network restoration with offline queue inspector dialog.
 - [x] Smart Notification Engine (`src/lib/notifications.ts` & header Bell drawer) for streak reminders, community alerts, and partner updates.
+
+### ✅ Sprint 8: Architecture Hardening, Bandwidth Optimization & Localized Trust
+- [x] **P0 Infra**: Edge routing permissions resolved in `middleware.ts` & `vercel.json` (deep links `/discover`, `/onboarding`, `/challenges` open for public SSR browsing).
+- [x] **P0 Bandwidth & Storage**: Client-side canvas adaptive compression (`src/lib/image-compression.ts`), shrinking 5MB+ photos to `<150 KB` WebP format before upload with real-time bandwidth savings stats.
+- [x] **P0 Offline Storage**: Asynchronous IndexedDB storage engine (`EgnaOfflineDB`) storing binary evidence with auto-sync and manual queue management (`OfflineQueueModal.tsx`).
+- [x] **P1 Anti-Fraud & AI Pre-Screening**: Binary EXIF timestamp validator (`exif-validator.ts`), pixel entropy / dummy screenshot detector, and AI vision pre-screening heuristics (`ai-screening.ts`) with category confidence scores.
+- [x] **P1 Incentivized Peer Auditing**: Reputation staking vouching engine (`ProofAuditSection.tsx`) rewarding +15 Rep for accurate audits and penalizing spam approvals.
+- [x] **P1 Localization & Ge'ez Font**: **Noto Sans Ethiopic** font hierarchy, `:lang(am)` line-height calibration (1.65), WCAG AAA high-contrast tokens, and a 3-language selector (English 🇬🇧, አማርኛ 🇪🇹, Afaan Oromoo 🇪🇹).
+- [x] **P2 Localized Hierarchy & Micro-Squads**: Sub-city discovery (*Bole, Kirkos, Yeka, Arada, etc.*), University campus clustering (*AAU, ASTU, JU, etc.*), active schedule window matching, and 5-8 person micro-squads.
+- [x] **P2 Trust Guards & Privacy**: Regex & NLP anti-spam link guard (`link-guard.ts`) restricting unverified Telegram/WhatsApp links, and 1-click Face Auto-Blur canvas anonymization tool (`ImagePrivacyEditor.tsx`).
+- [x] **Database Migration**: `supabase/migrations/20260815000000_platform_v2_features.sql` with squads, proof verifications, and audit vouches.
 
 ---
 
@@ -55,3 +66,4 @@ The platform has been built, tested, and elevated to production status in full c
 - **Build Status:** 100% clean production build (`17/17` routes compiled).
 - **GitHub Repository:** `https://github.com/AbenezerAabrham/ethiopia-accountability-platform` (Branch: `main`).
 - **Live Vercel Deployment:** Configured & auto-deployed on Vercel.
+
